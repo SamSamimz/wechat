@@ -28,7 +28,7 @@
                   class="w-10 h-10 rounded-full"
                 />
                 <div>
-                  <div class="text-gray-800">User 1</div>
+                  <div class="text-gray-800">{{ buddy.name }}</div>
                   <div class="text-sm text-gray-500">Online</div>
                 </div>
               </li>

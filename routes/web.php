@@ -20,9 +20,12 @@ Route::get('/', function () {
 //         'buddy' => $buddy
 //     ]);
 // })->name('chatIndex');
-Route::inertia('/chat', 'Chat',[
-    'buddies' => User::getBuddies()
-])->name('chat');
+
+Route::middleware(['auth','verified','status'])->group(function(){
+    Route::inertia('/chat', 'Chat',[
+        'buddies' => User::getBuddies()
+        ])->name('chat');
+    });
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
