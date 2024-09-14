@@ -24,24 +24,33 @@ class User extends Authenticatable
 
     public function getLastActiveAtAttribute($value)
     {
-        $lastActive = Carbon::parse($value);
-        $now        = Carbon::now();
-        $diff       = $lastActive->diffInSeconds($now, false);
-
-        if ($diff < 60) {
-            return 'Active '. $diff . ' seconds ago';
-        } elseif ($diff < 3600) {
-            return 'Active '. round($diff / 60) . ' minutes ago';
-        } elseif ($diff < 86400) {
-            return 'Active '. round($diff / 3600) . ' hours ago';
-        } elseif($diff < 604800) {
-            return 'Active '.round($diff / 86400) . ' days ago';
-        }else {
-            $diff = $lastActive->diffForHumans();
-            return $diff;
+        if (!$value) {
+            return null;
         }
 
+        $lastActive = Carbon::parse($value);
+        $now = Carbon::now();
+        $diff = $lastActive->diffInSeconds($now, false);
+
+        if ($diff < 60) {
+            return 'Active ' . round($diff) . ' seconds ago';
+        }
+
+        if ($diff < 3600) {
+            return 'Active ' . round($diff / 60) . ' minutes ago';
+        }
+
+        if ($diff < 86400) {
+            return 'Active ' . round($diff / 3600) . ' hours ago';
+        }
+
+        if ($diff < 604800) {
+            return 'Active ' . round($diff / 86400) . ' days ago';
+        }
+
+        return $lastActive->diffForHumans();
     }
+
 
     public function messages(): HasMany
     {
