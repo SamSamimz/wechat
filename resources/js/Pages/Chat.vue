@@ -11,6 +11,7 @@
             <div class="p-4 border-b border-gray-300 bg-white">
               <input
                 type="text"
+                v-model="search"
                 class="w-full p-2 border rounded-lg focus:outline-none focus:ring focus:border-blue-300"
                 placeholder="Search users..."
               />
@@ -57,7 +58,9 @@
                     <p class="text-lg font-semibold text-gray-800">
                       {{ buddy.name }}
                     </p>
-                    <p class="text-sm text-gray-500">{{ buddy.status }}</p>
+                    <p class="text-sm text-gray-500">
+                      {{ buddy.last_active_at }}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -143,6 +146,7 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head, Link } from "@inertiajs/vue3";
+import { computed } from "vue";
 import { ref } from "vue";
 
 defineProps({
@@ -153,6 +157,7 @@ defineProps({
 
 const loading = ref(false);
 const newMessage = ref("");
+const search = ref("");
 
 const formatTime = (timestamp) => {
   const date = new Date(timestamp);

@@ -3,6 +3,8 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -15,7 +17,12 @@ class User extends Authenticatable
 
     public static function getBuddies()
     {
-        return User::where('id', '!=', Auth::id())->select('id', 'name')->get();
+        return User::where('id', '!=', Auth::id())->select('id', 'name','last_active_at')->get();
+    }
+
+    public function getLastActiveAtAttribute($value)
+    {
+        return Carbon::parse($value)->diffForHumans();
     }
 
     public function messages(): HasMany
