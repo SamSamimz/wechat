@@ -21,7 +21,7 @@ Route::get('/', function () {
 //     ]);
 // })->name('chatIndex');
 Route::inertia('/chat', 'Chat',[
-    'buddy' => User::getBuddies()
+    'buddies' => User::getBuddies()
 ])->name('chat');
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');

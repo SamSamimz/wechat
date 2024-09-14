@@ -1,8 +1,3 @@
-<script setup>
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { Head } from "@inertiajs/vue3";
-</script>
-
 <template>
   <Head title="Chat" />
 
@@ -23,6 +18,8 @@ import { Head } from "@inertiajs/vue3";
 
             <ul class="overflow-y-auto h-full space-y-2 p-4">
               <li
+                v-for="buddy in buddies"
+                :key="buddy.id"
                 class="flex items-center space-x-3 p-2 rounded-lg cursor-pointer hover:bg-gray-200 transition"
               >
                 <img
@@ -33,34 +30,6 @@ import { Head } from "@inertiajs/vue3";
                 <div>
                   <div class="text-gray-800">User 1</div>
                   <div class="text-sm text-gray-500">Online</div>
-                </div>
-              </li>
-
-              <li
-                class="flex items-center space-x-3 p-2 rounded-lg cursor-pointer hover:bg-gray-200 transition"
-              >
-                <img
-                  src="https://via.placeholder.com/40"
-                  alt="User 2"
-                  class="w-10 h-10 rounded-full"
-                />
-                <div>
-                  <div class="text-gray-800">User 2</div>
-                  <div class="text-sm text-gray-500">Online</div>
-                </div>
-              </li>
-
-              <li
-                class="flex items-center space-x-3 p-2 rounded-lg cursor-pointer hover:bg-gray-200 transition"
-              >
-                <img
-                  src="https://via.placeholder.com/40"
-                  alt="User 3"
-                  class="w-10 h-10 rounded-full"
-                />
-                <div>
-                  <div class="text-gray-800">User 3</div>
-                  <div class="text-sm text-gray-500">Offline</div>
                 </div>
               </li>
             </ul>
@@ -124,3 +93,10 @@ import { Head } from "@inertiajs/vue3";
     </div>
   </AuthenticatedLayout>
 </template>
+<script setup>
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import { Head } from "@inertiajs/vue3";
+defineProps({
+  buddies: Object,
+});
+</script>
