@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Models\User;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -19,7 +20,9 @@ Route::get('/', function () {
 //         'buddy' => $buddy
 //     ]);
 // })->name('chatIndex');
-Route::inertia('/chat', 'Chat')->name('chat');
+Route::inertia('/chat', 'Chat',[
+    'buddy' => User::getBuddies()
+])->name('chat');
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
