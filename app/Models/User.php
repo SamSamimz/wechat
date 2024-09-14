@@ -17,12 +17,30 @@ class User extends Authenticatable
 
     public static function getBuddies()
     {
-        return User::where('id', '!=', Auth::id())->select('id', 'name','last_active_at')->get();
+        return User::where('id', '!=', Auth::id())
+                    ->select('id', 'name','last_active_at')
+                    ->get();
     }
 
     public function getLastActiveAtAttribute($value)
     {
-        return Carbon::parse($value)->diffForHumans();
+        $lastActive = Carbon::parse($value);
+        $now        = Carbon::now();
+        $diff       = $lastActive->diffInSeconds($now, false);
+
+        if ($diff < 60) {
+            return 'Active '. $diff . ' seconds ago';
+        } elseif ($diff < 3600) {
+            return 'Active '. round($diff / 60) . ' minutes ago';
+        } elseif ($diff < 86400) {
+            return 'Active '. round($diff / 3600) . ' hours ago';
+        } elseif($diff < 604800) {
+            return 'Active '.round($diff / 86400) . ' days ago';
+        }else {
+            $diff = $lastActive->diffForHumans();
+            return $diff;
+        }
+
     }
 
     public function messages(): HasMany
