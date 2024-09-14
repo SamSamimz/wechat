@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Models\Message;
 use App\Models\User;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -22,9 +23,13 @@ Route::get('/', function () {
 // })->name('chatIndex');
 
 Route::middleware(['auth','verified','status'])->group(function(){
-    Route::inertia('/chat', 'Chat',[
-        'buddies' => User::getBuddies()
-        ])->name('chat');
+    Route::get('/chat/{id?}', function($id = null) {
+        return Inertia::render('Chat', [
+            'buddies'  => User::getBuddies(),
+            'buddy'    => User::findOrFail($id),
+            'messages' => Message::getMessages($id)
+        ]);
+    })->name('chat');
     });
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');

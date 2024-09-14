@@ -2,10 +2,6 @@
   <Head title="Chat" />
 
   <AuthenticatedLayout>
-    <!-- <template #header>
-      <h2 class="font-semibold text-xl text-gray-800 leading-tight">Chat</h2>
-    </template> -->
-
     <div class="py-2">
       <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <div
@@ -17,75 +13,121 @@
             </div>
 
             <ul class="overflow-y-auto h-full space-y-2 p-4">
-              <li
-                v-for="buddy in buddies"
-                :key="buddy.id"
-                class="flex items-center space-x-3 p-2 rounded-lg cursor-pointer hover:bg-gray-200 transition"
-              >
-                <img
-                  src="https://via.placeholder.com/40"
-                  alt="User 1"
-                  class="w-10 h-10 rounded-full"
-                />
-                <div>
-                  <div class="text-gray-800">{{ buddy.name }}</div>
-                  <div class="text-sm text-gray-500">Online</div>
-                </div>
+              <li v-for="buddy in buddies" :key="buddy.id">
+                <Link
+                  :href="route('chat', buddy.id)"
+                  class="flex items-center space-x-3 p-2 rounded-lg cursor-pointer hover:bg-gray-200 transition"
+                  @click="selectBuddy(buddy)"
+                >
+                  <img
+                    :src="buddy.image || 'https://via.placeholder.com/40'"
+                    alt="User Image"
+                    class="w-10 h-10 rounded-full"
+                  />
+                  <div>
+                    <div class="text-gray-800">{{ buddy.name }}</div>
+                    <div class="text-sm text-gray-500">{{ buddy.status }}</div>
+                  </div>
+                </Link>
               </li>
             </ul>
           </div>
 
           <div class="flex-1 flex flex-col">
-            <div
-              class="flex items-center justify-between p-4 border-b border-gray-300 bg-gray-50"
-            >
-              <div class="flex items-center space-x-3">
-                <img
-                  src="https://via.placeholder.com/50"
-                  alt="User 1"
-                  class="w-12 h-12 rounded-full"
-                />
-                <div>
-                  <p class="text-lg font-semibold text-gray-800">User 1</p>
-                  <p class="text-sm text-gray-500">Online</p>
-                </div>
-              </div>
+            <!-- Loading  -->
+            <div v-if="loading" class="flex justify-center items-center h-full">
+              <div class="text-gray-500">Loading...</div>
             </div>
 
-            <div class="flex-1 p-6 overflow-y-auto">
-              <div class="flex items-start mb-4">
-                <div class="mr-3">
-                  <div class="bg-blue-500 text-white rounded-lg p-3">
-                    Hello, how are you?
-                    <div class="text-xs text-gray-300 mt-1">10:15 AM</div>
+            <div v-else-if="buddy" class="flex flex-col h-full">
+              <div
+                class="flex items-center justify-between p-4 border-b border-gray-300 bg-gray-50"
+              >
+                <div class="flex items-center space-x-3">
+                  <img
+                    :src="buddy.image || 'https://via.placeholder.com/50'"
+                    alt="User Image"
+                    class="w-12 h-12 rounded-full"
+                  />
+                  <div>
+                    <p class="text-lg font-semibold text-gray-800">
+                      {{ buddy.name }}
+                    </p>
+                    <p class="text-sm text-gray-500">{{ buddy.status }}</p>
                   </div>
                 </div>
               </div>
-              <div class="flex items-start mb-4 justify-end">
-                <div class="ml-3">
-                  <div class="bg-gray-300 text-black rounded-lg p-3">
-                    I'm good, thanks!
-                    <div class="text-xs text-gray-500 mt-1 text-right">
-                      10:17 AM
+
+              <div class="flex-1 p-6 overflow-y-auto">
+                <div
+                  v-if="messages.length === 0"
+                  class="text-gray-500 text-center"
+                >
+                  No messages yet.
+                </div>
+
+                <div v-else>
+                  <div
+                    v-for="(message, index) in messages"
+                    :key="index"
+                    :class="
+                      message.sender_id === $page.props.auth.user.id
+                        ? 'flex items-start mb-4 justify-end'
+                        : 'flex items-start mb-4'
+                    "
+                  >
+                    <div
+                      :class="
+                        message.sender_id === $page.props.auth.user.id
+                          ? 'mr-3'
+                          : 'ml-3'
+                      "
+                    >
+                      <div
+                        :class="
+                          message.sender_id === $page.props.auth.user.id
+                            ? 'bg-blue-500 text-white'
+                            : 'bg-gray-300 text-black'
+                        "
+                        class="rounded-lg p-3"
+                      >
+                        {{ message.message }}
+                        <div
+                          class="text-xs text-gray-300 mt-1"
+                          :class="
+                            message.sender_id === $page.props.auth.user.id
+                              ? 'text-gray-300'
+                              : 'text-slate-500'
+                          "
+                        >
+                          {{ formatTime(message.created_at) }}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
+
+              <div class="border-t border-gray-300 p-4 bg-gray-50">
+                <div class="flex items-center">
+                  <input
+                    type="text"
+                    v-model="newMessage"
+                    class="w-full p-3 border rounded-lg focus:outline-none focus:ring focus:border-blue-300"
+                    placeholder="Type your message..."
+                  />
+                  <button
+                    @click="sendMessage"
+                    class="ml-2 p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                  >
+                    Send
+                  </button>
+                </div>
+              </div>
             </div>
 
-            <div class="border-t border-gray-300 p-4 bg-gray-50">
-              <div class="flex items-center">
-                <input
-                  type="text"
-                  class="w-full p-3 border rounded-lg focus:outline-none focus:ring focus:border-blue-300"
-                  placeholder="Type your message..."
-                />
-                <button
-                  class="ml-2 p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-                >
-                  Send
-                </button>
-              </div>
+            <div v-else class="flex justify-center items-center h-full">
+              <div class="text-gray-500">Select a user to start chatting.</div>
             </div>
           </div>
         </div>
@@ -93,10 +135,37 @@
     </div>
   </AuthenticatedLayout>
 </template>
+
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { Head } from "@inertiajs/vue3";
+import { Head, Link } from "@inertiajs/vue3";
+import { ref } from "vue";
+
 defineProps({
-  buddies: Object,
+  buddies: Array,
+  messages: Array,
+  buddy: Object,
 });
+
+const loading = ref(false);
+const newMessage = ref("");
+
+const formatTime = (timestamp) => {
+  const date = new Date(timestamp);
+  return date.toDateString();
+};
+
+const selectBuddy = (buddy) => {
+  loading.value = true;
+  setTimeout(() => {
+    loading.value = false;
+  }, 1000);
+};
+
+const sendMessage = () => {
+  if (newMessage.value.trim() === "") return;
+  console.log("Message sent:", newMessage.value);
+
+  newMessage.value = "";
+};
 </script>
