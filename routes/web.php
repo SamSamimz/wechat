@@ -22,15 +22,23 @@ Route::get('/', function () {
 //     ]);
 // })->name('chatIndex');
 
-Route::middleware(['auth','verified','status'])->group(function(){
+Route::middleware(['auth', 'verified', 'status'])->group(function () {
     Route::get('/chat/{id?}', function($id = null) {
+        $buddies = User::getBuddies();
+
+        // If no ID is passed, select a random buddy and redirect
+        if (is_null($id) && $buddies->isNotEmpty()) {
+            $randomBuddy = $buddies->random();
+            return redirect()->route('chat', ['id' => $randomBuddy->id]);
+        }
+
         return Inertia::render('Chat', [
-            'buddies'  => User::getBuddies(),
+            'buddies'  => $buddies,
             'buddy'    => User::findOrFail($id),
             'messages' => Message::getMessages($id)
         ]);
     })->name('chat');
-    });
+});
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');

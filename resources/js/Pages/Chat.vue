@@ -9,7 +9,11 @@
         >
           <div class="w-1/4 bg-gray-100 border-r border-gray-300">
             <div class="p-4 border-b border-gray-300 bg-white">
-              <h3 class="text-lg font-semibold text-gray-800">Users</h3>
+              <input
+                type="text"
+                class="w-full p-2 border rounded-lg focus:outline-none focus:ring focus:border-blue-300"
+                placeholder="Search users..."
+              />
             </div>
 
             <ul class="overflow-y-auto h-full space-y-2 p-4">
