@@ -18,7 +18,7 @@
             </div>
 
             <ul class="overflow-y-auto h-full space-y-2 p-4">
-              <li v-for="buddy in buddies" :key="buddy.id">
+              <li v-for="buddy in filteredBuddies" :key="buddy.id">
                 <Link
                   :href="route('chat', buddy.id)"
                   class="flex items-center space-x-3 p-2 rounded-lg cursor-pointer hover:bg-gray-200 transition"
@@ -149,7 +149,7 @@ import { Head, Link } from "@inertiajs/vue3";
 import { computed } from "vue";
 import { ref } from "vue";
 
-defineProps({
+const props = defineProps({
   buddies: Array,
   messages: Array,
   buddy: Object,
@@ -158,6 +158,12 @@ defineProps({
 const loading = ref(false);
 const newMessage = ref("");
 const search = ref("");
+
+const filteredBuddies = computed(() => {
+  return props.buddies.filter((buddy) =>
+    buddy.name.toLowerCase().includes(search.value.toLowerCase())
+  );
+});
 
 const formatTime = (timestamp) => {
   const date = new Date(timestamp);
