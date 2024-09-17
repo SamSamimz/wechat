@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\MessageController;
 use App\Http\Controllers\ProfileController;
 use App\Models\Message;
 use App\Models\User;
@@ -25,8 +26,6 @@ Route::get('/', function () {
 Route::middleware(['auth', 'verified', 'status'])->group(function () {
     Route::get('/chat/{id?}', function($id = null) {
         $buddies = User::getBuddies();
-
-        // If no ID is passed, select a random buddy and redirect
         if (is_null($id) && $buddies->isNotEmpty()) {
             $randomBuddy = $buddies->random();
             return redirect()->route('chat', ['id' => $randomBuddy->id]);
@@ -38,6 +37,8 @@ Route::middleware(['auth', 'verified', 'status'])->group(function () {
             'messages' => Message::getMessages($id)
         ]);
     })->name('chat');
+
+    Route::post('/chat', [MessageController::class,'store']);
 });
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');

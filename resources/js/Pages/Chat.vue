@@ -84,6 +84,7 @@
                     "
                   >
                     <div
+                      class="max-w-96"
                       :class="
                         message.sender_id === $page.props.auth.user.id
                           ? 'mr-3'
@@ -96,7 +97,7 @@
                             ? 'bg-blue-500 text-white'
                             : 'bg-gray-300 text-black'
                         "
-                        class="rounded-lg p-3"
+                        class="rounded-lg p-3 max-w-96"
                       >
                         {{ message.message }}
                         <div
@@ -116,20 +117,20 @@
               </div>
 
               <div class="border-t border-gray-300 p-4 bg-gray-50">
-                <div class="flex items-center">
+                <form class="flex items-center" @submit.prevent="sendMessage">
                   <input
                     type="text"
-                    v-model="newMessage"
+                    v-model="form.newMessage"
                     class="w-full p-3 border rounded-lg focus:outline-none focus:ring focus:border-blue-300"
                     placeholder="Type your message..."
                   />
                   <button
-                    @click="sendMessage"
+                    type="submit"
                     class="ml-2 p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
                   >
                     Send
                   </button>
-                </div>
+                </form>
               </div>
             </div>
 
@@ -145,7 +146,7 @@
 
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { Head, Link } from "@inertiajs/vue3";
+import { Head, Link, useForm, usePage } from "@inertiajs/vue3";
 import { computed } from "vue";
 import { ref } from "vue";
 
@@ -156,7 +157,6 @@ const props = defineProps({
 });
 
 const loading = ref(false);
-const newMessage = ref("");
 const search = ref("");
 
 const filteredBuddies = computed(() => {
@@ -176,11 +176,17 @@ const selectBuddy = (buddy) => {
     loading.value = false;
   }, 1000);
 };
+const page = usePage();
+const form = useForm({
+  newMessage: "",
+  sender_id: page.props.auth.user.id,
+  receiver_id: props.buddy.id,
+});
 
 const sendMessage = () => {
-  if (newMessage.value.trim() === "") return;
-  console.log("Message sent:", newMessage.value);
-
-  newMessage.value = "";
+  if (form.newMessage.trim() === "") return;
+  // console.log("Message sent:", newMessage.value);
+  form.post(route("chat"));
+  form.newMessage = "";
 };
 </script>
