@@ -150,6 +150,11 @@ import { Head, Link, useForm, usePage } from "@inertiajs/vue3";
 import { computed } from "vue";
 import { ref } from "vue";
 
+window.Echo.channel("chat").listen("MessageSent", (e) => {
+  // console.log("MessageSent", e);
+  alert("Message sent");
+});
+
 const props = defineProps({
   buddies: Array,
   messages: Array,
