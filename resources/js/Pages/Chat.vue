@@ -149,14 +149,20 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head, Link, useForm, usePage } from "@inertiajs/vue3";
 import { computed, nextTick, onMounted, watch } from "vue";
 import { ref } from "vue";
+import { useToast } from "vue-toastification";
 const page = usePage();
+const toast = useToast();
 
 window.Echo.private(`chat.${page.props.auth.user.id}`).listen(
   "MessageSent",
   (e) => {
     props.messages.push(e.message);
     nextTick(() => scrollToBottom());
-    // alert(e.message);
+    const sender =
+      props.buddy.id === e.message.sender_id
+        ? props.buddy
+        : page.props.auth.user;
+    toast.info(` ${sender.name} sent you a message.`);
   }
 );
 
