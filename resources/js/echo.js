@@ -13,7 +13,7 @@ window.Echo = new Echo({
     enabledTransports: ['ws', 'wss'],
 });
 
-window.Echo.channel('chat')
-    .listen('MessageSent', (e) => {
-        console.log('MessageSent', e);
-    });
+// window.Echo.channel('chat')
+//     .listen('MessageSent', (e) => {
+//         console.log('MessageSent', e);
+//     });

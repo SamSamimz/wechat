@@ -17,6 +17,7 @@ createInertiaApp({
             .use(ZiggyVue)
             .mount(el);
     },
+    preserveScroll: true,
     progress: {
         color: '#4B5563',
     },

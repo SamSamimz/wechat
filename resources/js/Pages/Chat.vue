@@ -73,7 +73,7 @@
                   No messages yet.
                 </div>
 
-                <div v-else>
+                <div v-else ref="messageContainer">
                   <div
                     v-for="(message, index) in messages"
                     :key="index"
@@ -147,13 +147,18 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head, Link, useForm, usePage } from "@inertiajs/vue3";
-import { computed } from "vue";
+import { computed, nextTick, onMounted, watch } from "vue";
 import { ref } from "vue";
+const page = usePage();
 
-window.Echo.channel("chat").listen("MessageSent", (e) => {
-  // console.log("MessageSent", e);
-  alert("Message sent");
-});
+window.Echo.private(`chat.${page.props.auth.user.id}`).listen(
+  "MessageSent",
+  (e) => {
+    props.messages.push(e.message);
+    nextTick(() => scrollToBottom());
+    // alert(e.message);
+  }
+);
 
 const props = defineProps({
   buddies: Array,
@@ -163,6 +168,17 @@ const props = defineProps({
 
 const loading = ref(false);
 const search = ref("");
+const messageContainer = ref(null);
+
+onMounted(() => {
+  nextTick(() => scrollToBottom());
+});
+
+const scrollToBottom = () => {
+  if (messageContainer.value) {
+    messageContainer.value.scrollTop = messageContainer.value.scrollHeight;
+  }
+};
 
 const filteredBuddies = computed(() => {
   return props.buddies.filter((buddy) =>
@@ -171,8 +187,9 @@ const filteredBuddies = computed(() => {
 });
 
 const formatTime = (timestamp) => {
-  const date = new Date(timestamp);
-  return date.toDateString();
+  // const date = new Date(timestamp);
+  // return date.toDateString();
+  return timestamp;
 };
 
 const selectBuddy = (buddy) => {
@@ -181,7 +198,6 @@ const selectBuddy = (buddy) => {
     loading.value = false;
   }, 1000);
 };
-const page = usePage();
 const form = useForm({
   newMessage: "",
   sender_id: page.props.auth.user.id,
@@ -194,4 +210,11 @@ const sendMessage = () => {
   form.post(route("chat"));
   form.newMessage = "";
 };
+
+watch(
+  () => props.messages,
+  () => {
+    nextTick(() => scrollToBottom());
+  }
+);
 </script>
