@@ -153,19 +153,6 @@ import { useToast } from "vue-toastification";
 const page = usePage();
 const toast = useToast();
 
-window.Echo.private(`chat.${page.props.auth.user.id}`).listen(
-  "MessageSent",
-  (e) => {
-    props.messages.push(e.message);
-    nextTick(() => scrollToBottom());
-    const sender =
-      props.buddy.id === e.message.sender_id
-        ? props.buddy
-        : page.props.auth.user;
-    toast.info(` ${sender.name} sent you a message.`);
-  }
-);
-
 const props = defineProps({
   buddies: Array,
   messages: Array,
@@ -175,16 +162,6 @@ const props = defineProps({
 const loading = ref(false);
 const search = ref("");
 const messageContainer = ref(null);
-
-onMounted(() => {
-  nextTick(() => scrollToBottom());
-});
-
-const scrollToBottom = () => {
-  if (messageContainer.value) {
-    messageContainer.value.scrollTop = messageContainer.value.scrollHeight;
-  }
-};
 
 const filteredBuddies = computed(() => {
   return props.buddies.filter((buddy) =>
@@ -212,15 +189,42 @@ const form = useForm({
 
 const sendMessage = () => {
   if (form.newMessage.trim() === "") return;
-  // console.log("Message sent:", newMessage.value);
   form.post(route("chat"));
   form.newMessage = "";
 };
 
+const scrollToBottom = () => {
+  const container = messageContainer.value;
+  if (container) {
+    container.scrollTop = container.scrollHeight;
+  }
+};
+
+onMounted(() => {
+  nextTick(() => {
+    scrollToBottom();
+  });
+});
+
 watch(
   () => props.messages,
   () => {
+    nextTick(() => {
+      scrollToBottom();
+    });
+  },
+  { deep: true }
+);
+
+window.Echo.private(`chat.${page.props.auth.user.id}`).listen(
+  "MessageSent",
+  (e) => {
+    props.messages.push(e.message);
     nextTick(() => scrollToBottom());
+    const audio = new Audio("/sounds/sound.mp3");
+    audio.play();
+    // const sender = e.message.sender_id;
+    // toast.info(` ${sender.name} sent you a message.`);
   }
 );
 </script>
